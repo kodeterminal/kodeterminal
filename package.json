@@ -1,0 +1,31 @@
+{
+  "name": "terkode",
+  "version": "1.0.0",
+  "description": "Terminal-based memecoin data fetcher and tracker",
+  "main": "index.js",
+  "type": "module",
+  "bin": {
+    "terkode": "./bin/terkode.js"
+  },
+  "scripts": {
+    "start": "node bin/terkode.js",
+    "dev": "node --watch bin/terkode.js",
+    "build": "echo 'No build step required'",
+    "test": "echo 'Tests coming soon'"
+  },
+  "keywords": ["memecoin", "crypto", "terminal", "cli", "solana", "pump.fun", "defi"],
+  "author": "KODE Terminal Team",
+  "license": "MIT",
+  "dependencies": {
+    "chalk": "^5.3.0",
+    "commander": "^11.1.0",
+    "axios": "^1.6.0",
+    "ora": "^7.0.1",
+    "inquirer": "^9.2.12",
+    "table": "^6.8.1",
+    "figlet": "^1.7.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
