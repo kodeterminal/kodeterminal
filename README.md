@@ -16,11 +16,13 @@ KODE is a powerful command-line interface for tracking memecoin data in real-tim
 ## Installation
 
 ### Global Installation
+
 ```bash
 npm install -g kode
 ```
 
 ### Local Development
+
 ```bash
 git clone https://github.com/yourusername/kode.git
 cd kode
@@ -31,6 +33,7 @@ npm link
 ## Usage
 
 ### Get Token Information
+
 ```bash
 # Get basic token info
 kode get <contract_address>
@@ -40,6 +43,7 @@ kode get <contract_address> --watch
 ```
 
 ### View Trending Tokens
+
 ```bash
 # Show top 10 trending memecoins
 kode trending
@@ -49,6 +53,7 @@ kode trending --limit 20
 ```
 
 ### Manage Watchlist
+
 ```bash
 # Add token to watchlist
 kode watchlist --add <contract_address>
@@ -61,6 +66,7 @@ kode watchlist --show
 ```
 
 ### Search Tokens (Coming Soon)
+
 ```bash
 # Search for tokens by name or symbol
 kode search "dogecoin"
