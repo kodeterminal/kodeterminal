@@ -12,7 +12,32 @@ export async function fetchTokenData(contractAddress) {
   const spinner = ora("Fetching token data...").start();
 
   try {
-    // Try Jupiter API first for Solana mainnet
+    // Try DexScreener for Solana tokens first
+    const dexResponse = await axios.get(
+      `${DEXSCREENER_API}/dex/tokens/${contractAddress}`,
+      {
+        timeout: 10000,
+      }
+    );
+
+    if (dexResponse.data.pairs && dexResponse.data.pairs.length > 0) {
+      // Try to get holder count from Solana RPC
+      let holderCount = 0;
+      try {
+        holderCount = await getTokenHolderCount(contractAddress);
+      } catch (holderError) {
+        // If we can't get holder count, continue with 0
+      }
+
+      spinner.succeed("Token data fetched successfully");
+      return formatDexScreenerData(dexResponse.data, holderCount);
+    }
+  } catch (dexError) {
+    // Continue to next API
+  }
+
+  try {
+    // Try Jupiter API for Solana mainnet
     const jupiterResponse = await axios.get(
       `${JUPITER_API}/price?ids=${contractAddress}`,
       {
@@ -24,10 +49,19 @@ export async function fetchTokenData(contractAddress) {
       jupiterResponse.data.data &&
       jupiterResponse.data.data[contractAddress]
     ) {
+      // Try to get holder count from Solana RPC
+      let holderCount = 0;
+      try {
+        holderCount = await getTokenHolderCount(contractAddress);
+      } catch (holderError) {
+        // If we can't get holder count, continue with 0
+      }
+
       spinner.succeed("Token data fetched successfully");
       return formatJupiterData(
         jupiterResponse.data.data[contractAddress],
-        contractAddress
+        contractAddress,
+        holderCount
       );
     }
   } catch (jupiterError) {
@@ -35,35 +69,21 @@ export async function fetchTokenData(contractAddress) {
   }
 
   try {
-    // Try DexScreener for Solana tokens
-    const dexResponse = await axios.get(
-      `${DEXSCREENER_API}/dex/tokens/${contractAddress}`,
+    // Fallback to pump.fun
+    const pumpResponse = await axios.get(
+      `${PUMP_FUN_API}/coins/${contractAddress}`,
       {
         timeout: 10000,
       }
     );
 
     spinner.succeed("Token data fetched successfully");
-    return formatDexScreenerData(dexResponse.data);
-  } catch (dexError) {
-    try {
-      // Fallback to pump.fun
-      const pumpResponse = await axios.get(
-        `${PUMP_FUN_API}/coins/${contractAddress}`,
-        {
-          timeout: 10000,
-        }
-      );
-
-      spinner.succeed("Token data fetched successfully");
-      return formatPumpFunData(pumpResponse.data);
-    } catch (pumpError) {
-      spinner.fail("Failed to fetch token data");
-      throw new Error("Token not found on Solana mainnet APIs");
-    }
+    return formatPumpFunData(pumpResponse.data);
+  } catch (pumpError) {
+    spinner.fail("Failed to fetch token data");
+    throw new Error("Token not found on Solana mainnet APIs");
   }
 }
-
 
 export async function watchToken(contractAddress) {
   console.log(chalk.blue(`👀 Watching token: ${contractAddress}`));
@@ -99,7 +119,48 @@ export async function watchToken(contractAddress) {
   });
 }
 
-function formatJupiterData(data, address) {
+async function getTokenHolderCount(mintAddress) {
+  try {
+    // Use Solana RPC to get all token accounts for this mint
+    const response = await axios.post(SOLANA_RPC, {
+      jsonrpc: "2.0",
+      id: 1,
+      method: "getProgramAccounts",
+      params: [
+        "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA", // SPL Token program
+        {
+          encoding: "jsonParsed",
+          filters: [
+            {
+              dataSize: 165, // Token account data size
+            },
+            {
+              memcmp: {
+                offset: 0, // Mint address offset in token account
+                bytes: mintAddress,
+              },
+            },
+          ],
+        },
+      ],
+    });
+
+    if (response.data.result && Array.isArray(response.data.result)) {
+      // Filter out accounts with zero balance
+      const activeHolders = response.data.result.filter((account) => {
+        const balance = account.account.data.parsed.info.tokenAmount.uiAmount;
+        return balance > 0;
+      });
+      return activeHolders.length;
+    }
+    return 0;
+  } catch (error) {
+    // If we can't get holder count, return 0
+    return 0;
+  }
+}
+
+function formatJupiterData(data, address, holderCount = 0) {
   return {
     name: data.name || "Unknown",
     symbol: data.symbol || "N/A",
@@ -107,7 +168,7 @@ function formatJupiterData(data, address) {
     price: Number.parseFloat(data.price || 0),
     marketCap: data.marketCap ? Number.parseFloat(data.marketCap) : 0,
     volume24h: 0, // Jupiter doesn't provide volume
-    holders: 0, // Jupiter doesn't provide holder count
+    holders: holderCount,
     description: "Data from Jupiter API (Solana mainnet)",
     website: null,
     twitter: null,
@@ -131,7 +192,7 @@ function formatPumpFunData(data) {
   };
 }
 
-function formatDexScreenerData(data) {
+function formatDexScreenerData(data, holderCount = 0) {
   const pair = data.pairs?.[0];
   if (!pair) throw new Error("No trading pair found");
 
@@ -142,7 +203,7 @@ function formatDexScreenerData(data) {
     price: Number.parseFloat(pair.priceUsd || 0),
     marketCap: Number.parseFloat(pair.fdv || 0),
     volume24h: Number.parseFloat(pair.volume?.h24 || 0),
-    holders: 0, // DexScreener doesn't provide holder count
+    holders: holderCount,
     description: "Data from DexScreener",
     website: pair.info?.websites?.[0]?.url || null,
     twitter: pair.info?.socials?.find((s) => s.type === "twitter")?.url || null,
@@ -150,4 +211,3 @@ function formatDexScreenerData(data) {
       pair.info?.socials?.find((s) => s.type === "telegram")?.url || null,
   };
 }
-

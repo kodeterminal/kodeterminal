@@ -20,7 +20,7 @@ export function displayTokenInfo(tokenData) {
   );
   console.log(
     chalk.blue("Holders:"),
-    chalk.magenta(formatNumber(tokenData.holders))
+    chalk.magenta(formatHolderCount(tokenData.holders))
   );
 
   if (tokenData.description) {
@@ -38,12 +38,22 @@ export function displayTokenInfo(tokenData) {
 
   if (socials.length > 0) {
     console.log(chalk.blue("Socials:"), socials.join(" | "));
+    
+    // Display clickable links
+    if (tokenData.website) {
+      console.log(chalk.gray(`   Website: ${tokenData.website}`));
+    }
+    if (tokenData.twitter) {
+      console.log(chalk.gray(`   Twitter: ${tokenData.twitter}`));
+    }
+    if (tokenData.telegram) {
+      console.log(chalk.gray(`   Telegram: ${tokenData.telegram}`));
+    }
   }
 
   console.log(chalk.gray("─".repeat(50)));
   console.log(chalk.gray(`Last updated: ${new Date().toLocaleTimeString()}\n`));
 }
-
 
 export async function displayWatchList(watchlist) {
   if (watchlist.length === 0) {
@@ -78,4 +88,11 @@ function formatLargeNumber(num) {
   if (num >= 1e6) return (num / 1e6).toFixed(2) + "M";
   if (num >= 1e3) return (num / 1e3).toFixed(2) + "K";
   return num.toFixed(2);
+}
+
+function formatHolderCount(num) {
+  if (num >= 1e9) return Math.round(num / 1e9) + "B";
+  if (num >= 1e6) return Math.round(num / 1e6) + "M";
+  if (num >= 1e3) return Math.round(num / 1e3) + "K";
+  return Math.round(num).toString();
 }

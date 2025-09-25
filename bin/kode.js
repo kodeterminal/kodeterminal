@@ -4,10 +4,7 @@ import { Command } from "commander";
 import chalk from "chalk";
 import figlet from "figlet";
 import { fetchTokenData, watchToken } from "../src/api.js";
-import {
-  displayTokenInfo,
-  displayWatchList,
-} from "../src/display.js";
+import { displayTokenInfo, displayWatchList } from "../src/display.js";
 import {
   addToWatchlist,
   getWatchlist,
@@ -19,7 +16,7 @@ const program = new Command();
 // ASCII Art Header
 console.log(
   chalk.green(
-    figlet.textSync("KODE", {
+    figlet.textSync("KODE TERMINAL", {
       font: "ANSI Shadow",
       horizontalLayout: "default",
       verticalLayout: "default",
@@ -28,8 +25,9 @@ console.log(
 );
 
 console.log(
-  chalk.gray("> The terminal memecoin tracker that speaks your language\n")
+  chalk.gray("> The terminal memecoin tracker that speaks your language")
 );
+console.log(chalk.blue("🌐 Visit us: https://www.koodeterminal.com\n"));
 
 program
   .name("kode")
@@ -52,7 +50,6 @@ program
       console.error(chalk.red("Error fetching token data:"), error.message);
     }
   });
-
 
 program
   .command("watchlist")

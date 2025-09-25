@@ -41,7 +41,6 @@ kode get <contract_address>
 kode get <contract_address> --watch
 ```
 
-
 ### Manage Watchlist
 
 ```bash
@@ -66,5 +65,5 @@ kode search "dogecoin"
 
 ```bash
 # Track a Solana token
-kode get CejBaQt21V512bbE4tDbQ86vtry71R3JY3f8Heuppump
+kode get 5UUH9RTDiSpq6HKS6bp4NdU9PNJpXRXuiw6ShBTBhgH2
 ```
