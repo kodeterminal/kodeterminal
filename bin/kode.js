@@ -3,10 +3,9 @@
 import { Command } from "commander";
 import chalk from "chalk";
 import figlet from "figlet";
-import { fetchTokenData, fetchTrendingTokens, watchToken } from "../src/api.js";
+import { fetchTokenData, watchToken } from "../src/api.js";
 import {
   displayTokenInfo,
-  displayTrendingTable,
   displayWatchList,
 } from "../src/display.js";
 import {
@@ -54,23 +53,6 @@ program
     }
   });
 
-program
-  .command("trending")
-  .description("Show trending memecoins")
-  .option("-l, --limit <number>", "Number of tokens to show", "10")
-  .action(async (options) => {
-    try {
-      const trending = await fetchTrendingTokens(
-        Number.parseInt(options.limit)
-      );
-      displayTrendingTable(trending);
-    } catch (error) {
-      console.error(
-        chalk.red("Error fetching trending tokens:"),
-        error.message
-      );
-    }
-  });
 
 program
   .command("watchlist")

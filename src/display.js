@@ -1,5 +1,4 @@
 import chalk from "chalk";
-import { table } from "table";
 import { fetchTokenData } from "./api.js";
 
 export function displayTokenInfo(tokenData) {
@@ -45,53 +44,6 @@ export function displayTokenInfo(tokenData) {
   console.log(chalk.gray(`Last updated: ${new Date().toLocaleTimeString()}\n`));
 }
 
-export function displayTrendingTable(tokens) {
-  console.log(chalk.green.bold("\n🔥 Trending Memecoins\n"));
-
-  const data = [
-    [
-      chalk.blue.bold("Rank"),
-      chalk.blue.bold("Name"),
-      chalk.blue.bold("Symbol"),
-      chalk.blue.bold("Price"),
-      chalk.blue.bold("Market Cap"),
-      chalk.blue.bold("24h Volume"),
-    ],
-  ];
-
-  tokens.forEach((token, index) => {
-    data.push([
-      chalk.yellow(`#${index + 1}`),
-      chalk.white(token.name),
-      chalk.cyan(token.symbol),
-      chalk.green(`$${formatNumber(token.price)}`),
-      chalk.yellow(`$${formatLargeNumber(token.marketCap)}`),
-      chalk.cyan(`$${formatLargeNumber(token.volume24h)}`),
-    ]);
-  });
-
-  const config = {
-    border: {
-      topBody: chalk.gray("─"),
-      topJoin: chalk.gray("┬"),
-      topLeft: chalk.gray("┌"),
-      topRight: chalk.gray("┐"),
-      bottomBody: chalk.gray("─"),
-      bottomJoin: chalk.gray("┴"),
-      bottomLeft: chalk.gray("└"),
-      bottomRight: chalk.gray("┘"),
-      bodyLeft: chalk.gray("│"),
-      bodyRight: chalk.gray("│"),
-      bodyJoin: chalk.gray("│"),
-      joinBody: chalk.gray("─"),
-      joinLeft: chalk.gray("├"),
-      joinRight: chalk.gray("┤"),
-      joinJoin: chalk.gray("┼"),
-    },
-  };
-
-  console.log(table(data, config));
-}
 
 export async function displayWatchList(watchlist) {
   if (watchlist.length === 0) {

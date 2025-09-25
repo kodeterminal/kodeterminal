@@ -7,7 +7,6 @@ KODE is a powerful command-line interface for tracking memecoin data in real-tim
 ## Features
 
 - 📊 **Real-time token data** - Get live price, market cap, volume, and holder information
-- 🔥 **Trending tokens** - See what's hot in the memecoin space
 - 👀 **Watchlist management** - Track your favorite tokens
 - ⚡ **Live monitoring** - Watch tokens with real-time updates
 - 🎨 **Beautiful terminal UI** - Clean, colorful output with ASCII art
@@ -42,15 +41,6 @@ kode get <contract_address>
 kode get <contract_address> --watch
 ```
 
-### View Trending Tokens
-
-```bash
-# Show top 10 trending memecoins
-kode trending
-
-# Show top 20 trending memecoins
-kode trending --limit 20
-```
 
 ### Manage Watchlist
 
